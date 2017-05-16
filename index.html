@@ -213,8 +213,7 @@
 
                         if ((difficulties.indexOf(key) > -1 && chart !== null) &&
                                 (chart.difficulty >= lowerBound && chart.difficulty <= upperBound)) {
-                            if (!validCharts[chart.difficulty]){
-                                validCharts[chart.difficulty] = [{
+							chartObj = {
                                     'name': currentSong.name,
                                     'nameTranslation': currentSong.name_translation,
                                     'artist': currentSong.artist,
@@ -222,18 +221,12 @@
                                     'bpm': currentSong.bpm,
                                     'difficulty': key,
                                     'rating': chart.difficulty
-                                }];
+                                };
+                            if (!validCharts[chart.difficulty]){ //organize charts based on difficulty rating
+                                validCharts[chart.difficulty] = [chartObj];
                             }
                             else{
-                                validCharts[chart.difficulty].push({
-                                    'name': currentSong.name,
-                                    'nameTranslation': currentSong.name_translation,
-                                    'artist': currentSong.artist,
-                                    'artistTranslation': currentSong.artist_translation,
-                                    'bpm': currentSong.bpm,
-                                    'difficulty': key,
-                                    'rating': chart.difficulty
-                                });
+                                validCharts[chart.difficulty].push(chartObj);
                             }
                         }
                     }
@@ -253,6 +246,10 @@
                     html += '<div class="chart ' + randomChart.difficulty + '">';
 
                     html += '<div class="name">' + randomChart.name + '</div>';
+					if (randomChart.nameTranslation) {
+                        html += '<div class="name-translation">[' + randomChart.nameTranslation + ']</div>';
+                    }
+                    html += '<div class="artist">' + randomChart.artist + '</div>';
                     html += '<div class="bpm">' + randomChart.bpm + ' BPM</div>';
                     html += '<div class="difficulty ' + diff + '">' + diff.toUpperCase() + ' ' + randomChart.rating + '</div>';
                     html += '</div>';
