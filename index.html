@@ -34,6 +34,30 @@
     .padded {
       padding: 10px;
     }
+	
+	.weights {
+		margin-left: 2em;
+		display: none;
+	}
+	
+	.weights input{
+		display: inline-block;
+		width: 3em;
+		position: relative;
+		top: -2em;
+		right: 2.3em;
+	}
+	
+	.weights label{
+		display: inline-block;
+		  padding-top: 2em;
+	}
+	
+	.weights > span{
+		display: block;
+		padding-bottom: 15px;
+		margin-left: -1em;
+	}
 
     .chart-lists {
       flex: 1 0 0;
@@ -107,9 +131,35 @@
       </div>
       <div class='padded'>
         <span>Lower bound (inclusive):</span>
-        <input type='text' class='lower-bound' value='1'>
+        <input type='text' id="lower-bound" value='1'>
         <span>Upper bound (inclusive):</span>
-        <input type='text' class='upper-bound' value='19'>
+        <input type='text' id="upper-bound" value='19'>
+      </div>
+	  <div class='padded'>
+		<label>
+		  <input type='checkbox' id='weighted' value='weighted'>Use Weighted Distribution
+		</label>
+      </div>
+	  <div class='padded weights'>
+        <label>01<input type='number' id="weight-1" value="1"></label>
+        <label>02<input type='number' id="weight-2" value="1"></label>
+		<label>03<input type='number' id="weight-3" value="1"></label>
+		<label>04<input type='number' id="weight-4" value="1"></label>
+		<label>05<input type='number' id="weight-5" value="1"></label>
+		<label>06<input type='number' id="weight-6" value="1"></label>
+		<label>07<input type='number' id="weight-7" value="1"></label>
+		<label>08<input type='number' id="weight-8" value="1"></label>
+		<label>09<input type='number' id="weight-9" value="1"></label>
+		<label>10<input type='number' id="weight-10" value="1"></label>
+		<label>11<input type='number' id="weight-11" value="1"></label>
+		<label>12<input type='number' id="weight-12" value="1"></label>
+		<label>13<input type='number' id="weight-13" value="1"></label>
+		<label>14<input type='number' id="weight-14" value="1"></label>
+		<label>15<input type='number' id="weight-15" value="1"></label>
+		<label>16<input type='number' id="weight-16" value="1"></label>
+		<label>17<input type='number' id="weight-17" value="1"></label>
+		<label>18<input type='number' id="weight-18" value="1"></label>
+		<label>19<input type='number' id="weight-19" value="1"></label>
       </div>
       <div class='padded'>
         <span>Style:</span>
@@ -161,7 +211,7 @@
     </div>
     <div class='padded chart-lists'>
     </div>
-    <div class='padded footer'>By Jeff Lloyd. I'm aware this looks (as is coded) like crap - better version coming soon. Up to date as of 11/10/2017. <a href="https://github.com/jefflloyd/DDRCardDraw">View on GitHub.</a></div>
+    <div class='padded footer'>By Jeff Lloyd. I'm aware this looks (as is coded) like crap - better version coming soon. Up to date as of 11/10/2017. <a href="https://github.com/jefflloyd/DDRCardDraw">View on GitHub.</a> Weighted distribution functionality added by Chris Chike on 1/31/2018: <a href="https://github.com/cchike/DDRCardDraw">View on GitHub.</a></div>
   </div>
 </body>
 
@@ -189,12 +239,36 @@
   };
 
   ready(function() {
+	var displayWeights = function(event){
+	var lowerBound = parseInt(document.querySelector('#lower-bound').value, 10),
+        upperBound = parseInt(document.querySelector('#upper-bound').value, 10),
+	    weightInputs = document.querySelectorAll(".weights label");
+		for (var i = 0, len = weightInputs.length; i < len; i++) {
+			var rating = parseInt(weightInputs[i].firstElementChild.id.replace("weight-", ""), 10);
+			if (lowerBound <= rating && rating <= upperBound){
+				weightInputs[i].style.display = "inline-block";
+			}
+			else {
+				weightInputs[i].style.display = "none";
+			}
+		}
+	};
+	document.querySelector('#lower-bound').addEventListener('change', displayWeights);
+	document.querySelector('#upper-bound').addEventListener('change', displayWeights);
+	document.querySelector('#weighted').addEventListener('change', function(weighted){
+		if (weighted.target.checked){
+			document.querySelector(".weights").style.display = "block";
+		}
+		else{
+		document.querySelector(".weights").style.display = "none";
+		}
+	});
     document.querySelector('.random-button').addEventListener('click', function() {
       var chartListLength = document.querySelectorAll('.chart-list').length,
           chartListClass = 'chart-list-' + chartListLength,
           numChartsToRandom = parseInt(document.querySelector('.chart-count').value, 10),
-          lowerBound = parseInt(document.querySelector('.lower-bound').value, 10),
-          upperBound = parseInt(document.querySelector('.upper-bound').value, 10),
+          lowerBound = parseInt(document.querySelector('#lower-bound').value, 10),
+          upperBound = parseInt(document.querySelector('#upper-bound').value, 10),
           style = document.querySelector('input[name="style"]:checked').value,
           difficulties = Array.from(document.querySelectorAll('input[name="difficulty"]:checked')).map(function(item) {
             return item.value;
@@ -203,7 +277,8 @@
             return item.value;
           }),
           html = createElementHelper('div'),
-          validCharts = [],
+		  distribution = [], //will be populated with a number of entries for each difficulty rating according to its weight 
+		  validCharts = {},
           currentSong,
           charts,
           chart,
@@ -226,26 +301,53 @@
 
             if ((difficulties.indexOf(key) > -1 && chart !== null) &&
                 (chart.difficulty >= lowerBound && chart.difficulty <= upperBound)) {
-              validCharts.push({
-                'name': currentSong.name,
-                'nameTranslation': currentSong.name_translation,
-                'artist': currentSong.artist,
-                'artistTranslation': currentSong.artist_translation,
-                'bpm': currentSong.bpm,
-                'difficulty': key,
-                'rating': chart.difficulty
-              });
+              chartObj = {
+                                    'name': currentSong.name,
+                                    'nameTranslation': currentSong.name_translation,
+                                    'artist': currentSong.artist,
+                                    'artistTranslation': currentSong.artist_translation,
+                                    'bpm': currentSong.bpm,
+                                    'difficulty': key,
+                                    'rating': chart.difficulty
+                                };
+                            if (!validCharts[chart.difficulty]){ //organize charts based on difficulty rating
+                                validCharts[chart.difficulty] = [chartObj];
+                            }
+                            else{
+                                validCharts[chart.difficulty].push(chartObj);
+                            }
             }
           }
         }
       }
+	  
+	  for (var i = lowerBound; i <= upperBound; i++){ //for each difficulty rating within bounds
+			if (document.querySelector('#weighted').checked){
+				weight = document.querySelector('#weight-' + i).value; //Grabs the weight from the corresponding input box
+				for (var j = 0; j < weight; j++){ //add entries in the distribution according to its weight
+					distribution.push(i);
+				}
+			}
+			else { //No artificial weights. Use the natural weights according to the number of charts in each rating
+				var numCharts = validCharts[i].length;
+				for (var j = 0; j < numCharts; j++){ //add entries in the distribution according to the number of charts in that rating
+					distribution.push(i);
+				}
+			}
+		}
 
       for (var j = 0; j < numChartsToRandom; j++) {
-        randomIndex = Math.floor(Math.random() * validCharts.length),
-        randomChart = validCharts[randomIndex];
+        randomDifficulty = distribution[Math.floor(Math.random()*distribution.length)]; //determine a random difficulty rating according to the distribution
+        selectableCharts = validCharts[randomDifficulty.toString()]; //get the charts from that difficulty rating
+		if (selectableCharts.length === 0){ //If there are no more cards to draw from the selected difficulty, draw again
+			j--;
+			continue;
+		}
+		randomIndex = Math.floor(Math.random()*selectableCharts.length);
+        randomChart = selectableCharts[randomIndex];
 
         if (randomChart) {
-          validCharts.splice(randomIndex, 1);
+          selectableCharts.splice(randomIndex, 1);
           diff = randomChart.difficulty;
 
           var chartDiv = createElementHelper('div', 'chart ' + randomChart.difficulty);
@@ -257,11 +359,6 @@
           }
 
           var artistDiv = createElementHelper('div', 'artist', randomChart.artist);
-
-          if (randomChart.artistTranslation) {
-            var artistTranslationDiv = createElementHelper('div', 'artist-translation', '[' + randomChart.artistTranslation + ']');
-            artistDiv.append(artistTranslationDiv);
-          }
 
           var bpmDiv = createElementHelper('div', 'bpm', randomChart.bpm + ' BPM');
           var difficultyDiv = createElementHelper('div', 'difficulty ' + diff, diff.toUpperCase() + ' ' + randomChart.rating);
