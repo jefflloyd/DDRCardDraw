@@ -11295,7 +11295,7 @@ var songs = [
 			"challenge": {
 				"difficulty": "15",
 				"step": "456",
-				"shock": "0",
+				"shock": "35",
 				"freeze": "51"
 			},
 			"difficult": {
@@ -13766,7 +13766,7 @@ var songs = [
 			"challenge": {
 				"difficulty": "14",
 				"step": "353",
-				"shock": "0",
+				"shock": "34",
 				"freeze": "43"
 			},
 			"difficult": {
@@ -13794,7 +13794,7 @@ var songs = [
 			"challenge": {
 				"difficulty": "13",
 				"step": "352",
-				"shock": "0",
+				"shock": "35",
 				"freeze": "45"
 			},
 			"difficult": {
@@ -37704,7 +37704,7 @@ var songs = [
 			"challenge": {
 				"difficulty": "13",
 				"step": "207",
-				"shock": "0",
+				"shock": "92",
 				"freeze": "113"
 			},
 			"difficult": {
@@ -37732,7 +37732,7 @@ var songs = [
 			"challenge": {
 				"difficulty": "11",
 				"step": "208",
-				"shock": "0",
+				"shock": "83",
 				"freeze": "99"
 			},
 			"difficult": {
@@ -40487,7 +40487,7 @@ var songs = [
 			"challenge": {
 				"difficulty": "14",
 				"step": "401",
-				"shock": "0",
+				"shock": "22",
 				"freeze": "43"
 			},
 			"difficult": {
@@ -40515,7 +40515,7 @@ var songs = [
 			"challenge": {
 				"difficulty": "14",
 				"step": "404",
-				"shock": "0",
+				"shock": "22",
 				"freeze": "41"
 			},
 			"difficult": {
@@ -43042,7 +43042,7 @@ var songs = [
 			"challenge": {
 				"difficulty": "12",
 				"step": "328",
-				"shock": "23",
+				"shock": "28",
 				"freeze": "27"
 			},
 			"difficult": {
